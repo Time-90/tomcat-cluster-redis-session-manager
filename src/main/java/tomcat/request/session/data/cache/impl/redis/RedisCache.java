@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** author: Ranjith Manickam @ 12 Jul' 2018 */
+/**
+ * author: Ranjith Manickam @ 12 Jul' 2018
+ */
 public class RedisCache implements DataCache {
 
     private DataCache dataCache;
@@ -21,37 +23,49 @@ public class RedisCache implements DataCache {
         initialize(config);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] set(String key, byte[] value) {
         return this.dataCache.set(key, value);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long setnx(String key, byte[] value) {
         return this.dataCache.setnx(key, value);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long expire(String key, int seconds) {
         return this.dataCache.expire(key, seconds);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] get(String key) {
         return this.dataCache.get(key);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long delete(String key) {
         return this.dataCache.delete(key);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean exists(String key) {
         return this.dataCache.exists(key);
@@ -62,26 +76,16 @@ public class RedisCache implements DataCache {
         JedisPoolConfig poolConfig = getPoolConfig(config);
         switch (config.getRedisConfigType()) {
             case CLUSTER:
-                this.dataCache = new RedisClusterManager((Set<HostAndPort>) nodes,
-                        config.getRedisPassword(),
-                        config.getRedisTimeout(),
-                        poolConfig);
+                this.dataCache = new RedisClusterManager((Set<HostAndPort>) nodes, config.getRedisPassword(), config.getRedisTimeout(), poolConfig, config.getRedisClientName(),
+                                                         config.getRedisUseSsl());
                 break;
             case SENTINEL:
-                this.dataCache = new RedisSentinelManager((Set<String>) nodes,
-                        config.getRedisSentinelMaster(),
-                        config.getRedisPassword(),
-                        config.getRedisDatabase(),
-                        config.getRedisTimeout(),
-                        poolConfig);
+                this.dataCache = new RedisSentinelManager((Set<String>) nodes, config.getRedisSentinelMaster(), config.getRedisPassword(), config.getRedisDatabase(), config.getRedisTimeout(),
+                                                          poolConfig);
                 break;
             default:
-                this.dataCache = new RedisStandardManager(((List<String>) nodes).get(0),
-                        Integer.parseInt(((List<String>) nodes).get(1)),
-                        config.getRedisPassword(),
-                        config.getRedisDatabase(),
-                        config.getRedisTimeout(),
-                        poolConfig);
+                this.dataCache = new RedisStandardManager(((List<String>) nodes).get(0), Integer.parseInt(((List<String>) nodes).get(1)), config.getRedisPassword(), config.getRedisDatabase(),
+                                                          config.getRedisTimeout(), poolConfig, config.getRedisClientName(), config.getRedisUseSsl());
                 break;
         }
     }

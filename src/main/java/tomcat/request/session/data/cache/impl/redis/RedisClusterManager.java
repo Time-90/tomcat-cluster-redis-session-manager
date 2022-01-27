@@ -9,7 +9,9 @@ import redis.clients.jedis.exceptions.JedisRedirectionException;
 
 import java.util.Set;
 
-/** author: Ranjith Manickam @ 12 Jul' 2018 */
+/**
+ * author: Ranjith Manickam @ 12 Jul' 2018
+ */
 class RedisClusterManager extends RedisManager {
 
     private final JedisCluster cluster;
@@ -18,15 +20,31 @@ class RedisClusterManager extends RedisManager {
     private static final int DEFAULT_MAX_RE_DIRECTIONS = 5;
     private static final long FAILURE_WAIT_TIME = 4000L;
 
-    RedisClusterManager(Set<HostAndPort> nodes,
-                        String password,
-                        int timeout,
-                        JedisPoolConfig poolConfig) {
+    RedisClusterManager(
+            Set<HostAndPort> nodes, String password, int timeout, JedisPoolConfig poolConfig
+                       ) {
         super(null, FAILURE_WAIT_TIME);
         this.cluster = new JedisCluster(nodes, timeout, Protocol.DEFAULT_TIMEOUT, DEFAULT_MAX_RE_DIRECTIONS, password, poolConfig);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * support SSL
+     *
+     * @param nodes
+     * @param redisPassword
+     * @param redisTimeout
+     * @param poolConfig
+     * @param redisClientName
+     * @param redisUseSsl
+     */
+    public RedisClusterManager(Set<HostAndPort> nodes, String redisPassword, Integer redisTimeout, JedisPoolConfig poolConfig, String redisClientName, Boolean redisUseSsl) {
+        super(null, FAILURE_WAIT_TIME);
+        this.cluster = new JedisCluster(nodes, redisTimeout, Protocol.DEFAULT_TIMEOUT, DEFAULT_MAX_RE_DIRECTIONS, redisPassword, redisClientName, poolConfig, redisUseSsl);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] set(String key, byte[] value) {
         int tries = 0;
@@ -44,7 +62,9 @@ class RedisClusterManager extends RedisManager {
         return (retVal != null) ? retVal.getBytes() : null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long setnx(String key, byte[] value) {
         int tries = 0;
@@ -62,7 +82,9 @@ class RedisClusterManager extends RedisManager {
         return retVal;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long expire(String key, int seconds) {
         int tries = 0;
@@ -80,7 +102,9 @@ class RedisClusterManager extends RedisManager {
         return retVal;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] get(String key) {
         int tries = 0;
@@ -98,7 +122,9 @@ class RedisClusterManager extends RedisManager {
         return retVal;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Long delete(String key) {
         int tries = 0;
@@ -116,7 +142,9 @@ class RedisClusterManager extends RedisManager {
         return retVal;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Boolean exists(String key) {
         int tries = 0;

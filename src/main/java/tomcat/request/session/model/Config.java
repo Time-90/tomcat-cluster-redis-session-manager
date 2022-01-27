@@ -8,18 +8,20 @@ import java.io.Serializable;
 import static tomcat.request.session.annotation.Property.PropertyType.BOOLEAN;
 import static tomcat.request.session.annotation.Property.PropertyType.INTEGER;
 
-/** author: Ranjith Manickam @ 5 Feb' 2020 */
+/**
+ * author: Ranjith Manickam @ 5 Feb' 2020
+ */
 public class Config implements Serializable {
 
     private static final long serialVersionUID = 3480402257971437776L;
 
     public static final String APPLICATION_PROPERTIES_FILE = "redis-data-cache.properties";
 
-    /** Redis config type. */
+    /**
+     * Redis config type.
+     */
     public enum RedisConfigType {
-        DEFAULT,
-        SENTINEL,
-        CLUSTER
+        DEFAULT, SENTINEL, CLUSTER
     }
 
     @Property(name = "redis.hosts", defaultValue = "127.0.0.1:6379")
@@ -67,7 +69,13 @@ public class Config implements Serializable {
     @Property(name = "redis.timeout", type = INTEGER, defaultValue = "2000")
     private Integer redisTimeout;
 
-    @Property(name = "redis.sentinel.master", defaultValue = "mymaster")
+    @Property(name = "redis.client-name", defaultValue = "jedis-client")
+    private String redisClientName;
+
+    @Property(name = "redis.ssl", type = BOOLEAN, defaultValue = "false")
+    private Boolean redisUseSsl;
+
+    @Property(name = "redis.sentinel.master", defaultValue = "master")
     private String redisSentinelMaster;
 
     @Property(name = "redis.session.expiry.job.interval", type = INTEGER, defaultValue = "60")
@@ -85,26 +93,12 @@ public class Config implements Serializable {
     public Config() {
     }
 
-    public Config(String redisHosts,
-                  Boolean redisClusterEnabled,
-                  Boolean redisSentinelEnabled,
-                  Boolean lbStickySessionEnabled,
-                  Integer redisMaxActive,
-                  Boolean redisTestOnBorrow,
-                  Boolean redisTestOnReturn,
-                  Integer redisMaxIdle,
-                  Integer redisMinIdle,
-                  Boolean redisTestWhileIdle,
-                  Integer redisTestNumPerEviction,
-                  Integer redisTimeBetweenEviction,
-                  String redisPassword,
-                  Integer redisDatabase,
-                  Integer redisTimeout,
-                  String redisSentinelMaster,
-                  Integer redisSessionExpiryJobInterval,
-                  Integer redisSessionDataSyncJobInterval,
-                  String sessionPersistentPolicies,
-                  Integer redisSSOTimeout) {
+    public Config(
+            String redisHosts, Boolean redisClusterEnabled, Boolean redisSentinelEnabled, Boolean lbStickySessionEnabled, Integer redisMaxActive, Boolean redisTestOnBorrow,
+            Boolean redisTestOnReturn, Integer redisMaxIdle, Integer redisMinIdle, Boolean redisTestWhileIdle, Integer redisTestNumPerEviction, Integer redisTimeBetweenEviction,
+            String redisPassword, Integer redisDatabase, Integer redisTimeout, String redisClientName, Boolean redisUseSsl, String redisSentinelMaster, Integer redisSessionExpiryJobInterval,
+            Integer redisSessionDataSyncJobInterval, String sessionPersistentPolicies, Integer redisSSOTimeout
+                 ) {
         this.redisHosts = redisHosts;
         this.redisClusterEnabled = redisClusterEnabled;
         this.redisSentinelEnabled = redisSentinelEnabled;
@@ -120,6 +114,8 @@ public class Config implements Serializable {
         this.redisPassword = redisPassword;
         this.redisDatabase = redisDatabase;
         this.redisTimeout = redisTimeout;
+        this.redisClientName = redisClientName;
+        this.redisUseSsl = redisUseSsl;
         this.redisSentinelMaster = redisSentinelMaster;
         this.redisSessionExpiryJobInterval = redisSessionExpiryJobInterval;
         this.redisSessionDataSyncJobInterval = redisSessionDataSyncJobInterval;
@@ -127,134 +123,171 @@ public class Config implements Serializable {
         this.redisSSOTimeout = redisSSOTimeout;
     }
 
-    /** To get 'redis.hosts' value. */
+    /**
+     * To get 'redis.hosts' value.
+     */
     public String getRedisHosts() {
         return redisHosts;
     }
 
-    /** To get 'redis.cluster.enabled' value. */
+    /**
+     * To get 'redis.cluster.enabled' value.
+     */
     public Boolean getRedisClusterEnabled() {
         return redisClusterEnabled;
     }
 
-    /** To get 'redis.sentinel.enabled' value. */
+    /**
+     * To get 'redis.sentinel.enabled' value.
+     */
     public Boolean getRedisSentinelEnabled() {
         return redisSentinelEnabled;
     }
 
-    /** To get 'lb.sticky-session.enabled' value. */
+    /**
+     * To get 'lb.sticky-session.enabled' value.
+     */
     public Boolean getLbStickySessionEnabled() {
         return lbStickySessionEnabled;
     }
 
-    /** To get 'redis.max.active' value. */
+    /**
+     * To get 'redis.max.active' value.
+     */
     public Integer getRedisMaxActive() {
         return redisMaxActive;
     }
 
-    /** To get 'redis.test.onBorrow' value. */
+    /**
+     * To get 'redis.test.onBorrow' value.
+     */
     public Boolean getRedisTestOnBorrow() {
         return redisTestOnBorrow;
     }
 
-    /** To get 'redis.test.onReturn' value. */
+    /**
+     * To get 'redis.test.onReturn' value.
+     */
     public Boolean getRedisTestOnReturn() {
         return redisTestOnReturn;
     }
 
-    /** To get 'redis.max.idle' value. */
+    /**
+     * To get 'redis.max.idle' value.
+     */
     public Integer getRedisMaxIdle() {
         return redisMaxIdle;
     }
 
-    /** To get 'redis.min.idle' value. */
+    /**
+     * To get 'redis.min.idle' value.
+     */
     public Integer getRedisMinIdle() {
         return redisMinIdle;
     }
 
-    /** To get 'redis.test.whileIdle' value. */
+    /**
+     * To get 'redis.test.whileIdle' value.
+     */
     public Boolean getRedisTestWhileIdle() {
         return redisTestWhileIdle;
     }
 
-    /** To get 'redis.test.numPerEviction' value. */
+    /**
+     * To get 'redis.test.numPerEviction' value.
+     */
     public Integer getRedisTestNumPerEviction() {
         return redisTestNumPerEviction;
     }
 
-    /** To get 'redis.time.betweenEviction' value. */
+    /**
+     * To get 'redis.time.betweenEviction' value.
+     */
     public Integer getRedisTimeBetweenEviction() {
         return redisTimeBetweenEviction;
     }
 
-    /** To get 'redis.password' value. */
+    /**
+     * To get 'redis.password' value.
+     */
     public String getRedisPassword() {
         return (redisPassword == null || redisPassword.isEmpty()) ? null : redisPassword;
     }
 
-    /** To get 'redis.database' value. */
+    /**
+     * To get 'redis.database' value.
+     */
     public Integer getRedisDatabase() {
         return redisDatabase;
     }
 
-    /** To get 'redis.timeout' value. */
+    /**
+     * To get 'redis.timeout' value.
+     */
     public Integer getRedisTimeout() {
         return Math.max(redisTimeout, Protocol.DEFAULT_TIMEOUT);
     }
 
-    /** To get 'redis.sentinel.master' value. */
+    /**
+     * To get 'redis.client-name' value.
+     */
+    public String getRedisClientName() {
+        return redisClientName;
+    }
+
+    /**
+     * To get 'redis.ssl' value.
+     */
+    public Boolean getRedisUseSsl() {
+        return redisUseSsl;
+    }
+
+    /**
+     * To get 'redis.sentinel.master' value.
+     */
     public String getRedisSentinelMaster() {
         return redisSentinelMaster;
     }
 
-    /** To get 'redis.session.expiry.job.interval' value. */
+    /**
+     * To get 'redis.session.expiry.job.interval' value.
+     */
     public Integer getRedisSessionExpiryJobInterval() {
         return redisSessionExpiryJobInterval;
     }
 
-    /** To get 'redis.session.data-sync.job.interval' value. */
+    /**
+     * To get 'redis.session.data-sync.job.interval' value.
+     */
     public Integer getRedisSessionDataSyncJobInterval() {
         return redisSessionDataSyncJobInterval;
     }
 
-    /** To get 'session.persistent.policies' value */
+    /**
+     * To get 'session.persistent.policies' value
+     */
     public String getSessionPersistentPolicies() {
         return sessionPersistentPolicies;
     }
 
-    /** To get 'redis.sso.timeout' value */
+    /**
+     * To get 'redis.sso.timeout' value
+     */
     public Integer getRedisSSOTimeout() {
         return redisSSOTimeout;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return "Config{" +
-                "redisHosts='" + redisHosts + '\'' +
-                ", redisClusterEnabled=" + redisClusterEnabled +
-                ", redisSentinelEnabled=" + redisSentinelEnabled +
-                ", lbStickySessionEnabled=" + lbStickySessionEnabled +
-                ", redisMaxActive=" + redisMaxActive +
-                ", redisTestOnBorrow=" + redisTestOnBorrow +
-                ", redisTestOnReturn=" + redisTestOnReturn +
-                ", redisMaxIdle=" + redisMaxIdle +
-                ", redisMinIdle=" + redisMinIdle +
-                ", redisTestWhileIdle=" + redisTestWhileIdle +
-                ", redisTestNumPerEviction=" + redisTestNumPerEviction +
-                ", redisTimeBetweenEviction=" + redisTimeBetweenEviction +
-                ", redisPassword='" + redisPassword + '\'' +
-                ", redisDatabase=" + redisDatabase +
-                ", redisTimeout=" + redisTimeout +
-                ", redisSentinelMaster='" + redisSentinelMaster + '\'' +
-                ", redisSessionExpiryJobInterval=" + redisSessionExpiryJobInterval +
-                ", redisSessionDataSyncJobInterval=" + redisSessionDataSyncJobInterval +
-                ", sessionPersistentPolicies='" + sessionPersistentPolicies + '\'' +
-                ", redisSSOTimeout='" + redisSSOTimeout + '\'' +
-                '}';
+        return "Config{" + "redisHosts='" + redisHosts + '\'' + ", redisClusterEnabled=" + redisClusterEnabled + ", redisSentinelEnabled=" + redisSentinelEnabled + ", lbStickySessionEnabled=" + lbStickySessionEnabled + ", redisMaxActive=" + redisMaxActive + ", redisTestOnBorrow=" + redisTestOnBorrow + ", redisTestOnReturn=" + redisTestOnReturn + ", redisMaxIdle=" + redisMaxIdle + ", redisMinIdle=" + redisMinIdle + ", redisTestWhileIdle=" + redisTestWhileIdle + ", redisTestNumPerEviction=" + redisTestNumPerEviction + ", redisTimeBetweenEviction=" + redisTimeBetweenEviction + ", redisPassword='" + redisPassword + '\'' + ", redisDatabase=" + redisDatabase + ", redisTimeout=" + redisTimeout + ", redisClientName='" + redisClientName + '\'' + ", redisUseSsl=" + redisUseSsl + ", redisSentinelMaster='" + redisSentinelMaster + '\'' + ", redisSessionExpiryJobInterval=" + redisSessionExpiryJobInterval + ", redisSessionDataSyncJobInterval=" + redisSessionDataSyncJobInterval + ", sessionPersistentPolicies='" + sessionPersistentPolicies + '\'' + ", redisSSOTimeout=" + redisSSOTimeout + '}';
     }
 
-    /** To get redis config type. */
+    /**
+     * To get redis config type.
+     */
     public RedisConfigType getRedisConfigType() {
         if (this.getRedisClusterEnabled()) {
             return RedisConfigType.CLUSTER;
